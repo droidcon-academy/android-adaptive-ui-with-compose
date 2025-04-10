@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Adaptive Inbox</string>
+    <string name="inbox">Inbox</string>
+    <string name="sent">Sent</string>
+    <string name="spam">Spam</string>
+    <string name="trash">Trash</string>
+    <string name="new_mail">New Mail</string>
+    <string name="view_attachments">View Attachment(s)</string>
+    <string name="download">Download</string>
+    <string name="forward">Forward</string>
+    <string name="attachments_with_count">%1$s Attachment(s)</string>
+    <string name="replies_with_count">%1$s Replies</string>
+    <string name="reply">Reply</string>
+    <string name="reply_all">Reply All</string>
+    <string name="view_participants">View Participants</string>
+    <string name="participants">Participants</string>
+    <string name="droidcon">Droidcon</string>
+    <string name="search_mails">Search Mails</string>
+    <string name="mail">Mail</string>
+    <string name="meetings">Meetings</string>
+    <string name="join">Join</string>
+    <string name="upcoming_meetings">Upcoming Meetings</string>
+</resources>
