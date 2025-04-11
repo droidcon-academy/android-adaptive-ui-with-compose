@@ -1,12 +1,10 @@
 package com.droidcon.adaptiveinbox.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,13 +16,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,7 +28,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,8 +35,6 @@ import com.droidcon.adaptiveinbox.R
 import com.droidcon.adaptiveinbox.model.MailData
 import com.droidcon.adaptiveinbox.model.MailLabels
 import com.droidcon.adaptiveinbox.model.mailList
-import com.droidcon.adaptiveinbox.utils.toDate
-import com.droidcon.adaptiveinbox.utils.toFormattedString
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -98,127 +90,77 @@ fun MailListItem(
     onMailClicked: (mailId: String) -> Unit,
     isOpened: Boolean,
 ) {
-    BoxWithConstraints(
-        modifier = modifier
+    Card(
+        modifier = Modifier
+            .clip(CardDefaults.shape)
+            .clickable {
+                onMailClicked(mailData.mailId)
+            }
+            .clip(CardDefaults.shape),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isOpened) MaterialTheme.colorScheme.secondaryContainer
+            else MaterialTheme.colorScheme.surfaceVariant
+        ),
     ) {
-        val isCompact = this.maxWidth < 400.dp
-        val isMedium = this.maxWidth in 400.dp..600.dp
-
-        Card(
+        Column(
             modifier = Modifier
-                .clip(CardDefaults.shape)
-                .clickable {
-                    onMailClicked(mailData.mailId)
-                }
-                .clip(CardDefaults.shape),
-            colors = CardDefaults.cardColors(
-                containerColor = if (isOpened) MaterialTheme.colorScheme.secondaryContainer
-                else MaterialTheme.colorScheme.surfaceVariant
-            ),
+                .fillMaxWidth()
+                .padding(12.dp)
         ) {
-            Column(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(12.dp)
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                if (!isCompact) {
-                    FlowRow(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        mailData.labels.forEach { label ->
-                            MailLabelsListItem(
-                                modifier = Modifier,
-                                label = label
-                            )
-                        }
-                    }
+                mailData.labels.forEach { label ->
+                    MailLabelsListItem(
+                        modifier = Modifier,
+                        label = label
+                    )
                 }
+            }
+
+            Spacer(
+                modifier = Modifier
+                    .height(6.dp),
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                ProfilePicture(
+                    modifier = Modifier
+                        .size(45.dp),
+                    name = mailData.replies.first().senderDetails.fullName
+                )
 
                 Spacer(
                     modifier = Modifier
-                        .height(6.dp),
+                        .width(6.dp),
                 )
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                Column(
+                    modifier = Modifier
+                        .wrapContentHeight()
+                        .weight(1f)
                 ) {
-                    ProfilePicture(
-                        modifier = Modifier
-                            .size(45.dp),
-                        name = mailData.replies.first().senderDetails.fullName
+                    Text(
+                        text = mailData.replies.first().senderDetails.fullName,
+                        style = MaterialTheme.typography.titleMedium
                     )
 
                     Spacer(
                         modifier = Modifier
-                            .width(6.dp),
+                            .height(4.dp),
                     )
 
-                    Column(
-                        modifier = Modifier
-                            .wrapContentHeight()
-                            .weight(1f)
-                    ) {
-                        Text(
-                            text = mailData.replies.first().senderDetails.fullName,
-                            style = MaterialTheme.typography.titleMedium
-                        )
-
-                        Spacer(
-                            modifier = Modifier
-                                .height(4.dp),
-                        )
-
-                        Text(
-                            text = mailData.subject,
-                            style = MaterialTheme.typography.bodyLarge,
-                        )
-
-                        if (!isCompact) {
-                            Text(
-                                text = mailData.replies.last().body,
-                                style = MaterialTheme.typography.bodySmall,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-                    }
-
-                    if (!isCompact && !isMedium) {
-                        Spacer(
-                            modifier = Modifier
-                                .width(6.dp),
-                        )
-
-                        Column(
-                            modifier = Modifier,
-                            verticalArrangement = Arrangement.spacedBy(
-                                space = 8.dp
-                            ),
-                            horizontalAlignment = Alignment.End
-                        ) {
-                            Text(
-                                text = mailData.replies.last().timeMillis.toDate()
-                                    .toFormattedString(),
-                                style = MaterialTheme.typography.labelMedium,
-                            )
-
-                            IconButton(
-                                onClick = {},
-                                modifier = Modifier
-                                    .clip(CircleShape)
-                                    .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-                                    .size(18.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.StarBorder,
-                                    contentDescription = "Favorite",
-                                    tint = MaterialTheme.colorScheme.outline
-                                )
-                            }
-                        }
-                    }
+                    Text(
+                        text = mailData.subject,
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
                 }
             }
         }

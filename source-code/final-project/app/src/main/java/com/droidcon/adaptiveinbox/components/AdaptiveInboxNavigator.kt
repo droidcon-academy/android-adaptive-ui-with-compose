@@ -30,7 +30,6 @@ import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldLayout
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.material3.rememberDrawerState
@@ -48,25 +47,16 @@ import com.droidcon.adaptiveinbox.model.HOME_DRAWER_DESTINATIONS
 import com.droidcon.adaptiveinbox.model.HOME_MAIN_DESTINATIONS
 import com.droidcon.adaptiveinbox.model.MailDestination
 import com.droidcon.adaptiveinbox.utils.hasRoute
-import com.droidcon.adaptiveinbox.utils.isCompact
 import kotlinx.coroutines.launch
 
 @Composable
 fun AdaptiveInboxNavigator(
     modifier: Modifier = Modifier,
     currentDestination: NavDestination?,
+    navLayoutType: NavigationSuiteType,
     onNavigate: (MailDestination) -> Unit,
     content: @Composable () -> Unit
 ) {
-    val adaptiveInfo = currentWindowAdaptiveInfo()
-    val windowPosture = adaptiveInfo.windowPosture
-
-    val navLayoutType = when {
-        windowPosture.isTabletop -> NavigationSuiteType.NavigationBar
-        adaptiveInfo.windowSizeClass.isCompact() -> NavigationSuiteType.NavigationBar
-        else -> NavigationSuiteType.NavigationRail
-    }
-
     var drawerState =
         rememberDrawerState(initialValue = DrawerValue.Closed)
 

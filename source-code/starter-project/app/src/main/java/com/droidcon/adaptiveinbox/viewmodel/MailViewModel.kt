@@ -6,7 +6,6 @@ import com.droidcon.adaptiveinbox.data.DataRepository
 import com.droidcon.adaptiveinbox.model.DataState
 import com.droidcon.adaptiveinbox.model.MailRepliesData
 import com.droidcon.adaptiveinbox.model.MailType
-import com.droidcon.adaptiveinbox.model.PaneType
 import com.droidcon.adaptiveinbox.ui.state.MailUIState
 import com.droidcon.adaptiveinbox.ui.state.MeetingsUIState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,7 +28,7 @@ class MailViewModel @Inject constructor(
     private val _meetingsUiState = MutableStateFlow(MeetingsUIState(isLoading = true))
     val meetingsUiState: StateFlow<MeetingsUIState> = _meetingsUiState
 
-    fun getMails(mailType: MailType, paneType: PaneType) {
+    fun getMails(mailType: MailType) {
         viewModelScope.launch {
             dataRepository.getMailsByType(mailType = mailType)
                 .onEach { dataState ->
@@ -39,13 +38,8 @@ class MailViewModel @Inject constructor(
                                 it.copy(
                                     mailList = dataState.data,
                                     isLoading = false,
-                                    selectedMail = if (paneType != PaneType.SINGLE_PANE)
-                                        dataState.data.first()
-                                    else
-                                        null,
+                                    selectedMail = it.selectedMail,
                                     selectedMessageForAttachments = mailUiState.value.selectedMessageForAttachments,
-                                    isMailDetailsScreenOpened = mailUiState.value.isMailDetailsScreenOpened,
-                                    isAttachmentsListOpened = mailUiState.value.isAttachmentsListOpened
                                 )
                             }
                         }
@@ -57,7 +51,7 @@ class MailViewModel @Inject constructor(
         }
     }
 
-    fun openMailDetailsScreen(mailId: String, paneType: PaneType) {
+    fun openMailDetailsScreen(mailId: String) {
         viewModelScope.launch {
             dataRepository.getMailByMailId(mailId = mailId)
                 .onEach { dataState ->
@@ -65,8 +59,7 @@ class MailViewModel @Inject constructor(
                         is DataState.Success -> {
                             _mailUiState.update {
                                 it.copy(
-                                    selectedMail = dataState.data,
-                                    isMailDetailsScreenOpened = paneType == PaneType.SINGLE_PANE
+                                    selectedMail = dataState.data
                                 )
                             }
                         }
@@ -86,13 +79,11 @@ class MailViewModel @Inject constructor(
     }
 
     fun openAttachmentDetailsScreen(
-        selectedMessageForAttachments: MailRepliesData,
-        paneType: PaneType
+        selectedMessageForAttachments: MailRepliesData
     ) {
         _mailUiState.update {
             it.copy(
-                selectedMessageForAttachments = selectedMessageForAttachments,
-                isAttachmentsListOpened = paneType == PaneType.SINGLE_PANE
+                selectedMessageForAttachments = selectedMessageForAttachments
             )
         }
     }

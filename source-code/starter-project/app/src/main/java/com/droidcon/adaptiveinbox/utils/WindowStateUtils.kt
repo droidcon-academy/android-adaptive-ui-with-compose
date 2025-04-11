@@ -1,22 +1,14 @@
 package com.droidcon.adaptiveinbox.utils
 
-import android.content.Context
 import android.graphics.Rect
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.coroutineScope
-import androidx.lifecycle.flowWithLifecycle
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
+import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
+import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.window.core.layout.WindowHeightSizeClass
 import androidx.window.core.layout.WindowSizeClass
 import androidx.window.core.layout.WindowWidthSizeClass
-import androidx.window.layout.DisplayFeature
 import androidx.window.layout.FoldingFeature
-import androidx.window.layout.WindowInfoTracker
-import com.droidcon.adaptiveinbox.model.PaneType
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
@@ -58,105 +50,14 @@ fun isSeparating(foldFeature: FoldingFeature?): Boolean {
     return foldFeature?.state == FoldingFeature.State.FLAT && foldFeature.isSeparating
 }
 
-fun getDisplayFeatures(
-    context: Context,
-    lifecycle: Lifecycle
-): StateFlow<List<DisplayFeature>> {
-    return WindowInfoTracker.getOrCreate(context)
-        .windowLayoutInfo(context)
-        .flowWithLifecycle(lifecycle)
-        .map { layoutInfo -> layoutInfo.displayFeatures }
-        .stateIn(
-            scope = lifecycle.coroutineScope,
-            started = SharingStarted.Eagerly,
-            initialValue = emptyList()
-        )
-}
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+fun <T> ThreePaneScaffoldNavigator<T>.isListPaneVisible(): Boolean =
+    scaffoldValue[ListDetailPaneScaffoldRole.List] == PaneAdaptedValue.Expanded
 
-fun getDevicePosture(
-    context: Context,
-    lifecycle: Lifecycle
-): StateFlow<DevicePosture> {
-    return WindowInfoTracker.getOrCreate(context)
-        .getDevicePostureFlow(context, lifecycle)
-        .stateIn(
-            scope = lifecycle.coroutineScope,
-            started = SharingStarted.Eagerly,
-            initialValue = DevicePosture.NormalPosture
-        )
-}
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+fun <T> ThreePaneScaffoldNavigator<T>.isDetailPaneVisible(): Boolean =
+    scaffoldValue[ListDetailPaneScaffoldRole.Detail] == PaneAdaptedValue.Expanded
 
-fun WindowInfoTracker.getDevicePostureFlow(
-    context: Context,
-    lifecycle: Lifecycle
-): Flow<DevicePosture> {
-    return windowLayoutInfo(context)
-        .flowWithLifecycle(lifecycle)
-        .map { layoutInfo ->
-            val foldingFeature =
-                layoutInfo.displayFeatures
-                    .filterIsInstance<FoldingFeature>()
-                    .firstOrNull()
-            when {
-                isBookPosture(foldingFeature) ->
-                    DevicePosture.BookPosture(foldingFeature.bounds)
-
-                isTableTopPosture(foldingFeature) ->
-                    DevicePosture.TableTopPosture(foldingFeature.bounds, foldingFeature.orientation)
-
-                isSeparating(foldingFeature) ->
-                    DevicePosture.Separating(foldingFeature.bounds, foldingFeature.orientation)
-
-                else -> DevicePosture.NormalPosture
-            }
-        }
-}
-
-/**
- * This function is used to determine the pane type based on the width size class and device posture.
- * The logic returns the pane type based on the following rules:
- *
- * Tablet:
- * - Portrait -> SINGLE_PANE
- * - Landscape -> ADAPTIVE_PANE
- *
- * Foldable:
- * - Opened
- *  - Any Scape -> ADAPTIVE_PANE
- * - Half Opened
- *  - Any Scape -> DUAL_PANE
- * - Closed
- *  - Portrait -> SINGLE_PANE
- *  - Landscape -> ADAPTIVE_PANE
- *
- * - Phone:
- *  - Portrait -> SINGLE_PANE
- *  - Landscape -> ADAPTIVE_PANE
- */
-fun androidx.compose.material3.windowsizeclass.WindowWidthSizeClass.getPaneType(
-    foldingDevicePosture: DevicePosture
-): PaneType {
-    return when (this) {
-        androidx.compose.material3.windowsizeclass.WindowWidthSizeClass.Compact -> {
-            PaneType.SINGLE_PANE
-        }
-
-        androidx.compose.material3.windowsizeclass.WindowWidthSizeClass.Medium -> {
-            if (foldingDevicePosture == DevicePosture.NormalPosture) {
-                PaneType.SINGLE_PANE
-            } else {
-                PaneType.DUAL_PANE
-            }
-        }
-
-        androidx.compose.material3.windowsizeclass.WindowWidthSizeClass.Expanded -> {
-            if (foldingDevicePosture == DevicePosture.NormalPosture) {
-                PaneType.ADAPTIVE_PANE
-            } else {
-                PaneType.DUAL_PANE
-            }
-        }
-
-        else -> PaneType.SINGLE_PANE
-    }
-}
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+fun <T> ThreePaneScaffoldNavigator<T>.isExtraPaneVisible(): Boolean =
+    scaffoldValue[ListDetailPaneScaffoldRole.Extra] == PaneAdaptedValue.Expanded

@@ -12,8 +12,6 @@
     <string name="replies_with_count">%1$s Replies</string>
     <string name="reply">Reply</string>
     <string name="reply_all">Reply All</string>
-    <string name="view_participants">View Participants</string>
-    <string name="participants">Participants</string>
     <string name="droidcon">Droidcon</string>
     <string name="search_mails">Search Mails</string>
     <string name="mail">Mail</string>

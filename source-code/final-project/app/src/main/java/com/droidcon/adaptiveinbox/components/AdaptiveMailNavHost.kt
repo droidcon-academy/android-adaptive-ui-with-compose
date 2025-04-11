@@ -3,6 +3,7 @@ package com.droidcon.adaptiveinbox.components
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
@@ -37,8 +38,7 @@ fun AdaptiveMailNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     paneType: PaneType,
-    displayFeatures: List<DisplayFeature>,
-    isCompact: Boolean
+    displayFeatures: List<DisplayFeature>
 ) {
     NavHost(
         modifier = modifier,
@@ -65,22 +65,18 @@ fun AdaptiveMailNavHost(
                         .safeDrawingPadding(),
                     mailList = mailUIState.mailList,
                     selectedMail = mailUIState.selectedMail,
-                    isMailDetailsScreenOpened = mailUIState.isMailDetailsScreenOpened,
                     selectedMessageForAttachments = mailUIState.selectedMessageForAttachments,
-                    isAttachmentsListOpened = mailUIState.isAttachmentsListOpened,
                     paneType = paneType,
                     displayFeatures = displayFeatures,
-                    isCompact = isCompact,
                     onMailClicked = { mailId ->
-                        viewModel.openMailDetailsScreen(mailId, paneType)
+                        viewModel.openMailDetailsScreen(mailId)
                     },
                     onMailDetailsClosed = {
                         viewModel.closeMailDetailsScreen()
                     },
                     onViewAttachmentsClicked = {
                         viewModel.openAttachmentDetailsScreen(
-                            selectedMessageForAttachments = it,
-                            paneType = paneType
+                            selectedMessageForAttachments = it
                         )
                     },
                     onAttachmentsScreenClosed = {
@@ -154,12 +150,21 @@ fun AdaptiveInboxNavigator(
     val paneType =
         calculateWindowSizeClass(activity = activity).widthSizeClass.getPaneType(devicePosture)
     val displayFeatures by getDisplayFeatures(context, lifecycle).collectAsState()
+
     val adaptiveInfo = currentWindowAdaptiveInfo()
     val isCompact = adaptiveInfo.windowSizeClass.isCompact()
+    val windowPosture = adaptiveInfo.windowPosture
+
+    val navLayoutType = when {
+        windowPosture.isTabletop -> NavigationSuiteType.NavigationBar
+        isCompact -> NavigationSuiteType.NavigationBar
+        else -> NavigationSuiteType.NavigationRail
+    }
 
     AdaptiveInboxNavigator(
         modifier = modifier,
         currentDestination = currentNavBarDestination,
+        navLayoutType = navLayoutType,
         onNavigate = { destination ->
             navigationActions.navigateTo(destination)
         }
@@ -169,8 +174,7 @@ fun AdaptiveInboxNavigator(
                 .fillMaxSize(),
             navController = navController,
             paneType = paneType,
-            displayFeatures = displayFeatures,
-            isCompact = isCompact
+            displayFeatures = displayFeatures
         )
     }
 }

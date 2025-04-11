@@ -47,6 +47,9 @@ sealed interface MailMainNavRoute: BaseNavRoute {
 @Serializable
 sealed interface MailAttachmentsNavRoute {
     @Serializable
+    data object MailList: MailAttachmentsNavRoute
+
+    @Serializable
     data object Details: MailAttachmentsNavRoute
 
     @Serializable

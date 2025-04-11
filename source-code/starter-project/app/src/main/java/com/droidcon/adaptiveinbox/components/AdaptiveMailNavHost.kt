@@ -2,43 +2,30 @@ package com.droidcon.adaptiveinbox.components
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
-import androidx.window.layout.DisplayFeature
 import com.droidcon.adaptiveinbox.model.MailDrawerNavRoute
 import com.droidcon.adaptiveinbox.model.MailMainNavRoute
 import com.droidcon.adaptiveinbox.model.MailType
-import com.droidcon.adaptiveinbox.model.PaneType
 import com.droidcon.adaptiveinbox.utils.MailNavigationActions
-import com.droidcon.adaptiveinbox.utils.getDevicePosture
-import com.droidcon.adaptiveinbox.utils.getDisplayFeatures
-import com.droidcon.adaptiveinbox.utils.getPaneType
-import com.droidcon.adaptiveinbox.utils.isCompact
 import com.droidcon.adaptiveinbox.viewmodel.MailViewModel
 
 @Composable
 fun AdaptiveMailNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    paneType: PaneType,
-    displayFeatures: List<DisplayFeature>,
-    isCompact: Boolean
 ) {
     NavHost(
         modifier = modifier,
@@ -56,7 +43,7 @@ fun AdaptiveMailNavHost(
                 val mailUIState by viewModel.mailUiState.collectAsState()
 
                 LaunchedEffect(mailType) {
-                    viewModel.getMails(mailType = mailType, paneType = paneType)
+                    viewModel.getMails(mailType = mailType)
                 }
 
                 MailContainer(
@@ -65,22 +52,16 @@ fun AdaptiveMailNavHost(
                         .safeDrawingPadding(),
                     mailList = mailUIState.mailList,
                     selectedMail = mailUIState.selectedMail,
-                    isMailDetailsScreenOpened = mailUIState.isMailDetailsScreenOpened,
                     selectedMessageForAttachments = mailUIState.selectedMessageForAttachments,
-                    isAttachmentsListOpened = mailUIState.isAttachmentsListOpened,
-                    paneType = paneType,
-                    displayFeatures = displayFeatures,
-                    isCompact = isCompact,
                     onMailClicked = { mailId ->
-                        viewModel.openMailDetailsScreen(mailId, paneType)
+                        viewModel.openMailDetailsScreen(mailId)
                     },
                     onMailDetailsClosed = {
                         viewModel.closeMailDetailsScreen()
                     },
                     onViewAttachmentsClicked = {
                         viewModel.openAttachmentDetailsScreen(
-                            selectedMessageForAttachments = it,
-                            paneType = paneType
+                            selectedMessageForAttachments = it
                         )
                     },
                     onAttachmentsScreenClosed = {
@@ -127,8 +108,6 @@ fun AdaptiveMailNavHost(
                     .safeDrawingPadding(),
                 carousel = meetingsUiState.carousel,
                 meetings = meetingsUiState.meetings,
-                paneType = paneType,
-                displayFeatures = displayFeatures
             )
         }
     }
@@ -139,23 +118,12 @@ fun AdaptiveMailNavHost(
 fun AdaptiveInboxNavigator(
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
-    val activity = context as androidx.activity.ComponentActivity
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
-
     val navController = rememberNavController()
     val navigationActions = remember(navController) {
         MailNavigationActions(navController)
     }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentNavBarDestination = navBackStackEntry?.destination
-
-    val devicePosture by getDevicePosture(context, lifecycle).collectAsState()
-    val paneType =
-        calculateWindowSizeClass(activity = activity).widthSizeClass.getPaneType(devicePosture)
-    val displayFeatures by getDisplayFeatures(context, lifecycle).collectAsState()
-    val adaptiveInfo = currentWindowAdaptiveInfo()
-    val isCompact = adaptiveInfo.windowSizeClass.isCompact()
 
     AdaptiveInboxNavigator(
         modifier = modifier,
@@ -168,9 +136,6 @@ fun AdaptiveInboxNavigator(
             modifier = Modifier
                 .fillMaxSize(),
             navController = navController,
-            paneType = paneType,
-            displayFeatures = displayFeatures,
-            isCompact = isCompact
         )
     }
 }

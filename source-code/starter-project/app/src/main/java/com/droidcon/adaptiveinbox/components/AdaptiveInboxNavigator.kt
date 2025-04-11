@@ -1,5 +1,6 @@
 package com.droidcon.adaptiveinbox.components
 
+import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,10 +30,8 @@ import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldLayout
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -48,25 +47,16 @@ import com.droidcon.adaptiveinbox.model.HOME_DRAWER_DESTINATIONS
 import com.droidcon.adaptiveinbox.model.HOME_MAIN_DESTINATIONS
 import com.droidcon.adaptiveinbox.model.MailDestination
 import com.droidcon.adaptiveinbox.utils.hasRoute
-import com.droidcon.adaptiveinbox.utils.isCompact
 import kotlinx.coroutines.launch
 
 @Composable
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 fun AdaptiveInboxNavigator(
     modifier: Modifier = Modifier,
     currentDestination: NavDestination?,
     onNavigate: (MailDestination) -> Unit,
     content: @Composable () -> Unit
 ) {
-    val adaptiveInfo = currentWindowAdaptiveInfo()
-    val windowPosture = adaptiveInfo.windowPosture
-
-    val navLayoutType = when {
-        windowPosture.isTabletop -> NavigationSuiteType.NavigationBar
-        adaptiveInfo.windowSizeClass.isCompact() -> NavigationSuiteType.NavigationBar
-        else -> NavigationSuiteType.NavigationRail
-    }
-
     var drawerState =
         rememberDrawerState(initialValue = DrawerValue.Closed)
 
@@ -99,25 +89,12 @@ fun AdaptiveInboxNavigator(
             )
         }
     ) {
-        NavigationSuiteScaffoldLayout(
-            layoutType = navLayoutType,
-            navigationSuite = {
-                when (navLayoutType) {
-                    NavigationSuiteType.NavigationBar -> MainBottomNavigationBar(
-                        currentDestination = currentDestination,
-                        navigateToTopLevelDestination = onNavigate
-                    )
-
-                    NavigationSuiteType.NavigationRail -> MainNavigationRail(
-                        currentDestination = currentDestination,
-                        navigateToTopLevelDestination = onNavigate,
-                        onDrawerClicked = {
-                            coroutineScope.launch {
-                                drawerState.open()
-                            }
-                        }
-                    )
-                }
+        Scaffold(
+            bottomBar = {
+                MainBottomNavigationBar(
+                    currentDestination = currentDestination,
+                    navigateToTopLevelDestination = onNavigate
+                )
             }
         ) {
             content()

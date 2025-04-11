@@ -36,6 +36,7 @@ import com.droidcon.adaptiveinbox.utils.mimeTypeToFormattedString
 fun MailAttachments(
     modifier: Modifier = Modifier,
     attachments: List<AttachmentDetails>,
+    showBackButton: Boolean,
     onBackPressed: () -> Unit
 ) {
     Column(
@@ -45,7 +46,7 @@ fun MailAttachments(
             modifier = Modifier
                 .fillMaxWidth(),
             title = stringResource(R.string.view_attachments, attachments.size.toString()),
-            hasBackButton = true,
+            hasBackButton = showBackButton,
             onBackPressed = onBackPressed,
         )
 
@@ -202,6 +203,7 @@ private fun MailAttachmentsCompactPreview() {
     MailAttachments(
         modifier = Modifier,
         attachments = mailRepliesData.attachments + mailRepliesData.attachments,
+        showBackButton = true,
         onBackPressed = {
         }
     )
@@ -214,6 +216,7 @@ private fun MailAttachmentsPreview() {
     MailAttachments(
         modifier = Modifier,
         attachments = mailRepliesData.attachments + mailRepliesData.attachments,
+        showBackButton = true,
         onBackPressed = {
         }
     )

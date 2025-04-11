@@ -1,9 +1,5 @@
 package com.droidcon.adaptiveinbox.components
 
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,9 +28,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-import androidx.compose.material3.adaptive.layout.AnimatedPane
-import androidx.compose.material3.adaptive.navigation.NavigableSupportingPaneScaffold
-import androidx.compose.material3.adaptive.navigation.rememberSupportingPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,16 +35,12 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.window.layout.DisplayFeature
 import com.droidcon.adaptiveinbox.R
 import com.droidcon.adaptiveinbox.model.Carousel
 import com.droidcon.adaptiveinbox.model.Meeting
-import com.droidcon.adaptiveinbox.model.PaneType
 import com.droidcon.adaptiveinbox.model.meetingsData
 import com.droidcon.adaptiveinbox.utils.toDate
 import com.droidcon.adaptiveinbox.utils.toFormattedString
-import com.google.accompanist.adaptive.TwoPane
-import com.google.accompanist.adaptive.VerticalTwoPaneStrategy
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
@@ -59,8 +48,6 @@ fun MeetingsUI(
     modifier: Modifier = Modifier,
     meetings: List<Meeting>,
     carousel: List<Carousel>,
-    paneType: PaneType,
-    displayFeatures: List<DisplayFeature>
 ) {
     @Composable
     fun MeetingsTutorialCarouselUI(
@@ -82,76 +69,21 @@ fun MeetingsUI(
         )
     }
 
-    when(paneType) {
-        PaneType.SINGLE_PANE -> {
-            val scrollState = rememberScrollState()
-            Column(
-                modifier = modifier
-                    .verticalScroll(scrollState)
-            ) {
-                MeetingsListUI(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                )
-                MeetingsTutorialCarouselUI(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                )
-            }
-        }
-        PaneType.DUAL_PANE -> {
-            TwoPane(
-                modifier = modifier,
-                first = {
-                    MeetingsListUI(
-                        modifier = Modifier
-                            .fillMaxSize()
-                    )
-                },
-                second = {
-                    MeetingsTutorialCarouselUI(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                    )
-                },
-                strategy = VerticalTwoPaneStrategy(
-                    splitFraction = 0.5f
-                ),
-                displayFeatures = displayFeatures
-            )
-        }
-        PaneType.ADAPTIVE_PANE -> {
-            val navigator = rememberSupportingPaneScaffoldNavigator()
-
-            NavigableSupportingPaneScaffold(
-                modifier = modifier,
-                navigator = navigator,
-                mainPane = {
-                    AnimatedPane(
-                        enterTransition = slideInHorizontally() + fadeIn(),
-                        exitTransition = slideOutHorizontally() + fadeOut()
-                    ) {
-                        MeetingsListUI(
-                            modifier = Modifier
-                                .fillMaxSize(),
-                        )
-                    }
-                },
-                supportingPane = {
-                    AnimatedPane(
-                        enterTransition = slideInHorizontally() + fadeIn(),
-                        exitTransition = slideOutHorizontally() + fadeOut()
-                    ) {
-                        MeetingsTutorialCarouselUI(
-                            modifier = Modifier
-                                .fillMaxSize(),
-                        )
-                    }
-                }
-            )
-        }
+    val scrollState = rememberScrollState()
+    Column(
+        modifier = modifier
+            .verticalScroll(scrollState)
+    ) {
+        MeetingsListUI(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+        )
+        MeetingsTutorialCarouselUI(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+        )
     }
 }
 
@@ -377,8 +309,6 @@ private fun MeetingsUIPreview() {
         modifier = Modifier
             .fillMaxSize(),
         carousel = meetingsData.carousel,
-        meetings = meetingsData.meetings,
-        paneType = PaneType.SINGLE_PANE,
-        displayFeatures = emptyList()
+        meetings = meetingsData.meetings
     )
 }

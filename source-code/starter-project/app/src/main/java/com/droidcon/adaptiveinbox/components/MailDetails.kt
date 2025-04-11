@@ -1,10 +1,9 @@
 package com.droidcon.adaptiveinbox.components
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -73,56 +72,48 @@ fun MailDetails(
 fun MailActioningStrip(
     modifier: Modifier = Modifier,
 ) {
-    BoxWithConstraints { 
-        val itemsPerRow = if (this.maxWidth > 600.dp) {
-            3
-        } else {
-            2
-        }
-        FlowRow(
-            modifier = modifier,
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            maxItemsInEachRow = itemsPerRow
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        OutlinedButton(
+            onClick = {},
+            modifier = Modifier
+                .weight(1f),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.surfaceBright
+            )
         ) {
-            OutlinedButton(
-                onClick = {},
-                modifier = Modifier
-                    .weight(1f),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceBright
-                )
-            ) {
-                Text(
-                    text = stringResource(R.string.forward),
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-            OutlinedButton(
-                onClick = {},
-                modifier = Modifier
-                    .weight(1f),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceBright
-                )
-            ) {
-                Text(
-                    text = stringResource(R.string.reply),
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-            OutlinedButton(
-                onClick = {},
-                modifier = Modifier
-                    .weight(1f),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceBright
-                )
-            ) {
-                Text(
-                    text = stringResource(R.string.reply_all),
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
+            Text(
+                text = stringResource(R.string.forward),
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+        OutlinedButton(
+            onClick = {},
+            modifier = Modifier
+                .weight(1f),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.surfaceBright
+            )
+        ) {
+            Text(
+                text = stringResource(R.string.reply),
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+        OutlinedButton(
+            onClick = {},
+            modifier = Modifier
+                .weight(1f),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.surfaceBright
+            )
+        ) {
+            Text(
+                text = stringResource(R.string.reply_all),
+                color = MaterialTheme.colorScheme.onSurface
+            )
         }
     }
 }

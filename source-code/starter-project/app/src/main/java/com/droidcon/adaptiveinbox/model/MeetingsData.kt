@@ -30,17 +30,7 @@ val meetingsData = MeetingsData(
             meetingsId = "2",
             meetingsTitle = "Team Standup",
             meetingTimeMillis = 1672534799000L
-        ),
-        Meeting(
-            meetingsId = "3",
-            meetingsTitle = "Project Kickoff",
-            meetingTimeMillis = 1672538399000L
-        ),
-        Meeting(
-            meetingsId = "4",
-            meetingsTitle = "Client Call",
-            meetingTimeMillis = 1672541999000L
-        ),
+        )
     ),
     carousel = listOf(
         Carousel(

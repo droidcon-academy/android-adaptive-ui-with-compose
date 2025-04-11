@@ -33,10 +33,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastRoundToInt
 import coil3.compose.AsyncImage
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -45,6 +49,34 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.droidcon.adaptiveinbox.R
 import com.droidcon.adaptiveinbox.utils.toHslColor
+
+@Composable
+fun VerticalDragHandle(
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .background(
+                color = MaterialTheme.colorScheme.outline,
+                shape = CircleShape
+            )
+            .layout { measurable, _ ->
+                val dragHandleSize = DpSize(
+                    width = 4.dp,
+                    height = 48.dp
+                ).toSize()
+                // set constraints here to be the size needed
+                val placeable =
+                    measurable.measure(
+                        Constraints.fixed(
+                            dragHandleSize.width.fastRoundToInt(),
+                            dragHandleSize.height.fastRoundToInt()
+                        )
+                    )
+                layout(placeable.width, placeable.height) { placeable.placeRelative(0, 0) }
+            }
+    )
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

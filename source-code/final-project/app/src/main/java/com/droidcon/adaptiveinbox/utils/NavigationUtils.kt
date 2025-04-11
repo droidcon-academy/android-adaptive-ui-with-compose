@@ -1,10 +1,5 @@
 package com.droidcon.adaptiveinbox.utils
 
-import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
-import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
-import androidx.compose.material3.adaptive.layout.SupportingPaneScaffoldRole
-import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -33,23 +28,3 @@ class MailNavigationActions(
         }
     }
 }
-
-@OptIn(ExperimentalMaterial3AdaptiveApi::class)
-fun <T> ThreePaneScaffoldNavigator<T>.isListPaneVisible(): Boolean =
-    scaffoldValue[ListDetailPaneScaffoldRole.List] == PaneAdaptedValue.Expanded
-
-@OptIn(ExperimentalMaterial3AdaptiveApi::class)
-fun <T> ThreePaneScaffoldNavigator<T>.isDetailPaneVisible(): Boolean =
-    scaffoldValue[ListDetailPaneScaffoldRole.Detail] == PaneAdaptedValue.Expanded
-
-@OptIn(ExperimentalMaterial3AdaptiveApi::class)
-fun <T> ThreePaneScaffoldNavigator<T>.isExtraPaneVisible(): Boolean =
-    scaffoldValue[ListDetailPaneScaffoldRole.Extra] == PaneAdaptedValue.Expanded
-
-@OptIn(ExperimentalMaterial3AdaptiveApi::class)
-fun <T> ThreePaneScaffoldNavigator<T>.isMainPaneVisible(): Boolean =
-    scaffoldValue[SupportingPaneScaffoldRole.Main] == PaneAdaptedValue.Expanded
-
-@OptIn(ExperimentalMaterial3AdaptiveApi::class)
-fun <T> ThreePaneScaffoldNavigator<T>.isSupportingPaneVisible(): Boolean =
-    scaffoldValue[SupportingPaneScaffoldRole.Supporting] == PaneAdaptedValue.Expanded
